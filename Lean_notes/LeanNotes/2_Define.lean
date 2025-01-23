@@ -107,3 +107,52 @@ end foo
 #check foo.a -- Nat
 open foo
 #check a -- Nat
+
+/-
+# Dependent Type Theory
+Type depends on argument
+-/
+
+#check @List.cons--{α : Type u_1} → α → List α → List α
+
+/-
+# Implicit Arguments
+_ - infer argument
+{α: Type} - implicit named argument
+@ - before function call makes the arguments explicit
+
+-/
+#check id -- {u}{α: Type u}(a: α) → α. returns a.
+#check id 1 -- Nat
+#eval id 1 -- 1
+#check id "hello" -- String
+#check @id Nat -- Nat → Nat
+#check @id Nat 1 -- Nat
+#check @id _ 1 -- Nat
+
+def doublelist (l: List α ){α : Type} := l++l
+#check doublelist -- (α : Type) (l : List α) : {α✝ : Type} → List α
+def doublelist' (α : Type) (l: List α): List α  := l++l
+#eval doublelist' Nat [1,2]--[1,2,1,2]
+#eval doublelist' _ [1,2]--[1,2,1,2]
+
+def doublelist'' {α : Type} (l: List α):= l++l
+#eval doublelist'' [1,2]--[1,2,1,2]
+#eval @doublelist'' _ [1,2]--[1,2,1,2]
+
+--#eval doublelist'' Nat [1,2] -- error implicit argument not to be provided
+/-
+# Named Arguments
+-/
+#eval doublelist'' (l := [1,2]) (α := Nat) -- [1,2,1,2]
+
+/-
+# Curried Functions
+one argument at a time
+-/
+
+def h (m : Int) (n: Nat) : Int := m - n
+def h': Int → Nat → Int := λ m ↦ λ n ↦ m - n
+
+def composeSelf (f : Nat → Nat) (n : Nat) : Nat := f (f n)
+def composeSelf' : (Nat → Nat) → (Nat → Nat) := λ f ↦ λ n ↦ f (f n)
