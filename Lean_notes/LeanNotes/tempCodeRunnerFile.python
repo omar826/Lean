@@ -1,0 +1,17 @@
+import random
+
+# Define constraints
+T = random.randint(1, 10**4)  # Number of test cases
+total_n = 2 * 10**5  # Maximum sum of n across all test cases
+
+print(T)
+remaining_n = total_n
+
+for _ in range(T):
+    n = random.randint(1, min(2 * 10**5, remaining_n))  # Ensure total_n is not exceeded
+    remaining_n -= n
+    print(n)
+    print(" ".join(str(random.randint(1, 10**9)) for _ in range(n)))
+
+    if remaining_n <= 0:  # Stop if we've reached the max total_n
+        break
