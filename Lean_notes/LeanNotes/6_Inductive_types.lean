@@ -117,3 +117,32 @@ def numSteps (step: Nat → Nat)(h : ∀n: Nat, step (n + 1) ≤ n)
     termination_by n
 
 #check Nat.lt_add_one_of_le -- ∀ (n m : ℕ), n.succ ≤ m → n < m
+
+/-
+structure - like inductive types but with named fields
+if sqrt is a structure, sqrt.mk is a constructor
+⟨,⟩ - can also be used to construct a structure
+{field1 := val1, field2 := val2} - can be used to construct a structure
+-/
+
+structure Natsqrt (n: Nat) where
+  val: Nat
+  issqrt: val*val = n -- issqrt is a proof that val*val = n
+
+#check Natsqrt -- Nat → Type
+#check Natsqrt.mk -- Natsqrt.mk {n: Nat}(val: Nat)(isSqrt: val*val = n): Natsqrt n
+#check Natsqrt.issqrt-- Natsqrt.issqrt {n: Nat} (self: Natqrt n): self.val * self.val = n
+
+def sqrt4: Natsqrt 4 := ⟨2, rfl⟩
+def sqrt9: Natsqrt 9 := Natsqrt.mk 3 rfl
+
+#check sqrt4 -- Natsqrt 4
+#eval sqrt4 -- {val := 2, issqrt := rfl}
+#eval sqrt4.val -- 2
+
+/-
+let - local defn of variable
+have - local hypothesis that requires a proof
+-/
+def sqrt_prod {m n: Nat} (sqn: Natsqrt n)(sqm: Natsqrt m): Natsqrt (m*n) :=
+  let

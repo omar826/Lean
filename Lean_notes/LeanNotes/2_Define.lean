@@ -1,3 +1,6 @@
+--# constant definition
+def a: Nat := 1
+
 /-
 # Function Abstraction
 write functions without naming them
@@ -35,6 +38,9 @@ def sum (x: Nat) (y: Nat): Nat := x + y
 def sum' (x y: Nat) := x + y
 def sum'' := λ (x y: Nat) ↦ x + y
 def sum''' (x: Nat) := λ y: Nat ↦ x + y
+def sum'''' : Nat → Nat → Nat := λ x ↦ λ y ↦ x + y
+
+-- when defined by lambda notation, argument names are not given on the left side of the colon.
 
 #check sum -- Nat → Nat → Nat
 #check sum' -- Nat → Nat → Nat
@@ -44,9 +50,20 @@ def sum''' (x: Nat) := λ y: Nat ↦ x + y
 def greater (x y: Nat):=
   if x > y then x
   else y
+-- if else is either indented or on the same line as the if condition
+def greater' (x y: Nat):=
+  if x>y
+  then
+    x
+  else
+    y
+
 
 /-
 # Local Definitions
+'let' cannot be used in the top level
+single line - use ;
+
 -/
 
 #check let x := 5; x + 3 -- Nat
@@ -71,6 +88,7 @@ def apply (α β: Type) (f: α → β) (x: α): β := f x
 variable (α β: Type)
 variable (f: α → β)
 variable (x: α)
+
 
 def apply' := f x
 #check apply' -- Type → Type → (α → β) → α → β
@@ -156,3 +174,12 @@ def h': Int → Nat → Int := λ m ↦ λ n ↦ m - n
 
 def composeSelf (f : Nat → Nat) (n : Nat) : Nat := f (f n)
 def composeSelf' : (Nat → Nat) → (Nat → Nat) := λ f ↦ λ n ↦ f (f n)
+
+#eval composeSelf' (λ x ↦ x + 1) 3 -- 5
+
+/-
+# print
+prints the definition of a function
+-/
+
+#print h

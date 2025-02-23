@@ -11,6 +11,7 @@ variable (p q r : Prop)
 #check p ∨ q
 #check Or p q
 #check (p ∧ q) → r
+
 /-
 #guard_msgs in - adds error msg as comments
 -/
@@ -42,12 +43,16 @@ example: 3≤ 5 :=
 
 /-
 # Proof Irrelevance
-any 2 proofs of the same theorem are definitionally equal
+any 2 proofs of the same theorem(i.e same proposition type) are definitionally equal
 
 **#print**  - shows the proof of a theorem
 **show** -
 
 -/
+
+theorem proof_irrelevance {p: Prop}(h1 h2: p):
+    h1 = h2 :=
+    rfl
 
 theorem t1: p→ q→ p:=
     fun hp: p => fun hq: q => hp
@@ -165,3 +170,12 @@ example (hnp: ¬ p)(hq: q)(hqp: q → p): r :=
 # True
 True.intro -
 -/
+
+--# modus ponens and function application are the same
+
+def modus_ponens {p q: Prop}(h1: p)(h2: p → q): q :=
+    h2 h1
+def function_app {α β: Type}(f: α → β)(a: α): β :=
+    f a
+
+#eval function_app Nat.succ 5
