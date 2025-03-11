@@ -81,6 +81,12 @@ so we could have used exact h3 above.
 #check Nat.succ_le_succ -- n≤ m → n.succ≤ m.succ
 #check Nat.le_step -- n≤ m → n≤ m.succ
 #check Nat.le_refl -- True → n ≤ n
+#check Nat.zero_le -- True → 0 ≤ n
+#check Nat.le -- Nat(n) → Nat(m) → Prop(n≤ m)
+#check Nat.succ -- Nat(n) → Nat(n+1)
+#check Nat.mul_assoc -- (n,m,k) → n*m*p = n*(m*p)
+#check Nat.mul_comm -- (n,m) → n*m = m*n
+
 
 def someNat : Nat := by
   --goal: ℕ
@@ -149,3 +155,62 @@ macro "repeating" r:term "finish" f:term : tactic =>
 example: 4 ≤ 8 := by
   repeating Nat.le_step finish Nat.le_refl
   -- goal: No goals
+
+/-
+# rw
+rw is a tactic that rewrites the first instance in goal using a theorem
+rw[theorem1, theorem2]
+rw[Nat.mul_comm a b] - rewrites every instance of a*b to b*a
+rw[theorem] - rewrites lhs of theorem to rhs
+rw[← theorem] - rewrites rhs of theorem to lhs
+-/
+
+theorem sqrt_mul (a b: ℕ): (a*a)*(b*b) = (a*b)*(a*b) := by
+  -- goal: a *a *(b*b) = a*b*(a*b)
+  rw [Nat.mul_assoc]
+  -- goal: a*(a*(b*b)) = a*b*(a*b)
+  rw [Nat.mul_comm]
+  -- goal: a*(b*b)*a = a*b*(a*b)
+  rw [← Nat.mul_assoc]
+  -- goal: a*b*b*a = a*b*(a*b)
+  rw[Nat.mul_assoc (a*b), Nat.mul_comm a b]
+
+/-
+# unfold
+unfold is a tactic that replaces a defined constant with its definition
+-> unfold name
+# simp
+simp is a tactic that simplifies the goal using a set of rules
+simp [theorem1, theorem2] or simp
+differs from rw as it applies a set of rules recursively
+# symm
+if goal is a=b, symm changes it to b=a
+# assumption
+closes goal if it matches an available hypothesis
+# by_cases
+by_cases h: prop -- splits goal
+case pos => ... -- applies when prop is true
+case neg => ... -- applies when prop is false
+
+OR
+
+by_cases h: a ∨ b ∨ c
+case a => ...
+case b => ...
+case c => ...
+
+# induction
+induction n with
+| zero => ... (n=0)
+| succ n ih => ... (n=succ n, ih = goal)
+# show
+show 'goal' - explicitly states the goal
+
+# intro
+introduces assumptions to prove p → q or ∀ x, p x
+a→ b→ c := by
+  intro hp
+  intro hq
+  ...
+hp: a, hq: b
+-/

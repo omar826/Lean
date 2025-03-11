@@ -27,6 +27,8 @@
 α - \a
 β - \b
 ℕ - \Nat
+⟨ - \langle
+⟩ - \rangle
 # Comments
 - single line comments are written using --
 - multi line comments are written using /- -/
@@ -134,3 +136,12 @@ def G (α : Type _) : Type _ := α × α
 
 def H.{u2} (α : Type u2) : Type u2 := α × α
 #check H -- Type u2 → Type u2
+
+-- # type inference by Lean
+#eval 0 - 1 + 1 -- 1 (0 - 1 = 0 for Nat)
+#eval (0 : Int) - 1 + 1 -- 0 (0 - 1 = -1 for Int)
+
+/-
+to disable wrong code and show the error msg use:
+'#guard_msgs in' before the code
+-/

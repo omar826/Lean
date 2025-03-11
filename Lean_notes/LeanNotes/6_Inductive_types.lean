@@ -145,4 +145,152 @@ let - local defn of variable
 have - local hypothesis that requires a proof
 -/
 def sqrt_prod {m n: Nat} (sqn: Natsqrt n)(sqm: Natsqrt m): Natsqrt (m*n) :=
-  let
+  let val : Nat := sqm.val * sqn.val
+  have h: val* val = m*n := by
+    --goal: val*val = m*n
+    unfold val
+    --goal: sqm.val*sqn.val*sqm.val*sqn.val = m*n
+    simp [← sqm.issqrt,← sqn.issqrt]
+    --goal: sqm.val*sqn.val*(sqm.val*sqn.val) =
+    --sqm.val*sqm.val*(sqn.val*sqn.val)
+    rw[← Nat.mul_assoc]
+    --goal: sqm.val*sqn.val*sqm.val*sqn.val =
+    --sqm.val*sqm.val*(sqn.val*sqn.val)
+    rw[Nat.mul_assoc sqm.val sqn.val sqm.val]
+    rw[Nat.mul_comm sqn.val sqm.val]
+    rw[← Nat.mul_assoc]
+    --goal: sqm.val*sqm.val*sqn.val*sqn.val =
+    --sqm.val*sqm.val*(sqn.val*sqn.val)
+    rw[Nat.mul_assoc (sqm.val*sqm.val) sqn.val sqn.val]
+    --goal: no goals
+  ⟨val, h⟩
+
+/-
+# enumerative inductive types
+deriving Repr - automatically generates a string representation allowing values to be printed by #eval
+deriving Inhabited - automatically generates a default value usually the first constructor
+deriving DecidableEq - automatically generates a decidable equality between values
+-/
+
+inductive ans where
+  | yes : ans
+  | no : ans
+  | maybe : ans
+  deriving Repr, Inhabited, DecidableEq
+
+--using Repr
+#eval ans.yes -- ans.yes
+#eval repr ans.yes -- "ans.yes"
+
+#check ans.yes -- ans
+#check repr ans.yes -- Std.Format (text)
+
+--using Inhabited
+#eval (default: ans) -- ans.yes
+
+--using DecidableEq
+#eval ans.yes = ans.no -- false
+
+
+/-defining a function on the inductive type.
+values of inductive type can be mentioned without the namespace (eg: ans.yes)
+-/
+def ans.or (a b: ans): ans :=
+  match a, b with
+  | yes, _ => yes
+  | _, yes => yes
+  | no, no => no
+  | _, _ => maybe
+
+#eval ans.or ans.yes ans.no -- ans.yes
+/-
+open - opens the namespace
+open...in - opens the namespace only in the following block
+-/
+
+open ans in
+#eval or maybe no -- ans.maybe
+
+def ans.not (a: ans): ans :=
+  match a with
+  | yes => by
+    apply no
+  | no => by
+    exact yes
+  | maybe => maybe
+
+/-
+# non-recursive inductive type
+-/
+
+inductive answer where
+  | just (a: ans): answer
+  | because (a: ans)(reason: String): answer
+
+example: answer := answer.just ans.yes
+
+-- shortened version of answer
+
+def answer.short (a: answer) : ans :=
+  match a with
+  | just a' => a'
+  | because a' _ => a'
+
+--different notation for match
+
+def answer.short': answer → ans
+  | just a' => a'
+  | because a' _ => a'
+
+def eg1: answer := answer.because ans.no "no reason"
+
+open answer in
+#eval short eg1 -- ans.no
+--different way to apply function - dot notation
+#eval eg1.short -- ans.no
+
+#eval answer.short' eg1 -- ans.no
+
+--long answer
+inductive long_answer where
+  | just (a: ans): long_answer
+  | because (a: long_answer)(reason: String): long_answer
+
+def long_answer.eg3: long_answer :=
+  long_answer.because
+    (long_answer.because
+      (long_answer.just ans.yes)
+      "idk")
+    "not sure"
+
+--short answer
+def long_answer.short: long_answer → ans
+  | long_answer.just a => a
+  | long_answer.because a _ => long_answer.short a
+
+--expanded version
+def long_answer.short': long_answer → ans:=
+  λ a =>
+    match a with
+    | long_answer.just a' => a'
+    | long_answer.because a' _ => long_answer.short' a'
+
+--long answer from short
+def ans.just (a: ans): long_answer :=
+  long_answer.just a
+
+def ans.because (a: long_answer)(reason: String): long_answer :=
+  long_answer.because a reason
+
+--examples
+def long_answer.eg4: long_answer :=
+  ans.yes.just.because "idk"
+
+def long_answer.eg5: long_answer :=
+  because (just ans.yes) "idk"
+
+-- |>. - takes output of previous function as input to the next
+def long_answer.eg6: long_answer :=
+  ans.yes
+  |>.just
+  |>.because "idk"

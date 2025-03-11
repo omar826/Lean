@@ -37,15 +37,16 @@ eg) For natural numbers:
     * proof that P x is true
 .m - infers preexisting variable is imlicit argument
 -/
-theorem les_trans {a b c: Nat}: a ≤ b → b ≤ c → a ≤ c := by
-  intro h1 h2
-  induction h2 with
-  | refl => exact h1
-  | step h ih =>
-    /-
-    h1: a ≤ b
-    h2: b ≤ c
-    h: b ≤ m
-    ih: a ≤ m → a ≤ m.succ
-    -/
-    sorry
+
+#check Classical.em-- ∀ p: Prop, p ∨ ¬ p
+#check funext--∀ (x: α), f x = g x → f = g
+
+--quantifiers
+--∀ x: Nat, x = x
+def allnat := (x: Nat) →  x = x
+
+#print allnat-- ∀ (x: Nat), x = x
+
+--∃ x: Nat, x = 0
+def somenat := Exists fun x: Nat => x = 0
+#print somenat-- ∃ (x: Nat), x = 0
